@@ -16,10 +16,9 @@ class Thread1(threading.Thread):
     def run(self):
         print "Starting " + self.name + "\n"
 
-        vector_1a = matrix_a[0]
-        matrix_c[0][0] = vector_1a[0] * matrix_b[0][0] + vector_1a[1] * matrix_b[1][0] + vector_1a[2] * matrix_b[2][0]
-        matrix_c[0][1] = vector_1a[0] * matrix_b[0][1] + vector_1a[1] * matrix_b[1][1] + vector_1a[2] * matrix_b[2][1]
-        matrix_c[0][2] = vector_1a[0] * matrix_b[0][2] + vector_1a[1] * matrix_b[1][2] + vector_1a[2] * matrix_b[2][2]
+        matrix_c[0][0] = matrix_a[0][0] * matrix_b[0][0] + matrix_a[0][1] * matrix_b[1][0] + matrix_a[0][2] * matrix_b[2][0]
+        matrix_c[0][1] = matrix_a[0][0] * matrix_b[0][1] + matrix_a[0][1] * matrix_b[1][1] + matrix_a[0][2] * matrix_b[2][1]
+        matrix_c[0][2] = matrix_a[0][0] * matrix_b[0][2] + matrix_a[0][1] * matrix_b[1][2] + matrix_a[0][2] * matrix_b[2][2]
 
         print "End " + self.name + "\n"
 
@@ -33,10 +32,9 @@ class Thread2(threading.Thread):
     def run(self):
         print "Starting " + self.name + "\n"
 
-        vector_2a = matrix_a[1]
-        matrix_c[1][0] = vector_2a[0] * matrix_b[0][0] + vector_2a[1] * matrix_b[1][0] + vector_2a[2] * matrix_b[2][0]
-        matrix_c[1][1] = vector_2a[0] * matrix_b[0][1] + vector_2a[1] * matrix_b[1][1] + vector_2a[2] * matrix_b[2][1]
-        matrix_c[1][2] = vector_2a[0] * matrix_b[0][2] + vector_2a[1] * matrix_b[1][2] + vector_2a[2] * matrix_b[2][2]
+        matrix_c[1][0] = matrix_a[1][0] * matrix_b[0][0] + matrix_a[1][1] * matrix_b[1][0] + matrix_a[1][2] * matrix_b[2][0]
+        matrix_c[1][1] = matrix_a[1][0] * matrix_b[0][1] + matrix_a[1][1] * matrix_b[1][1] + matrix_a[1][2] * matrix_b[2][1]
+        matrix_c[1][2] = matrix_a[1][0] * matrix_b[0][2] + matrix_a[1][1] * matrix_b[1][2] + matrix_a[1][2] * matrix_b[2][2]
 
         print "End " + self.name + "\n"
 
@@ -50,10 +48,9 @@ class Thread3(threading.Thread):
     def run(self):
         print "Starting " + self.name + "\n"
 
-        vector_3a = matrix_a[2]
-        matrix_c[2][0] = vector_3a[0] * matrix_b[0][0] + vector_3a[1] * matrix_b[1][0] + vector_3a[2] * matrix_b[2][0]
-        matrix_c[2][1] = vector_3a[0] * matrix_b[0][1] + vector_3a[1] * matrix_b[1][1] + vector_3a[2] * matrix_b[2][1]
-        matrix_c[2][2] = vector_3a[0] * matrix_b[0][2] + vector_3a[1] * matrix_b[1][2] + vector_3a[2] * matrix_b[2][2]
+        matrix_c[2][0] = matrix_a[2][0] * matrix_b[0][0] + matrix_a[2][1] * matrix_b[1][0] + matrix_a[2][2] * matrix_b[2][0]
+        matrix_c[2][1] = matrix_a[2][0] * matrix_b[0][1] + matrix_a[2][1] * matrix_b[1][1] + matrix_a[2][2] * matrix_b[2][1]
+        matrix_c[2][2] = matrix_a[2][0] * matrix_b[0][2] + matrix_a[2][1] * matrix_b[1][2] + matrix_a[2][2] * matrix_b[2][2]
 
         print "End " + self.name + "\n"
 
