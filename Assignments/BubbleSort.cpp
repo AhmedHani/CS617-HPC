@@ -149,12 +149,13 @@ void slave(int slave_rank) {
 	sub_array = bubble_sort(sub_array, local_array_size);
 
 	MPI_Send(&local_array_size, 1, MPI_INT, 0, slave_rank, MPI_COMM_WORLD);
-	MPI_Send(sub_array + 0, local_array_size, MPI_INT, 0, slave_rank, MPI_COMM_WORLD); //... Send the index to the Master
+	MPI_Send(sub_array + 0, local_array_size, MPI_INT, 0, slave_rank, MPI_COMM_WORLD);
 
 	delete[] sub_array;
 }
 
 int main(int argc, char* argv[]) {
+	clock_t start = clock();
 	MPI_Init(&argc, &argv);
 
 	int rank;
@@ -170,6 +171,8 @@ int main(int argc, char* argv[]) {
 	} else {
 		slave(rank);
 	}
+
+	printf("\nTime taken: %.5fs\n", (double)(clock() - start)/CLOCKS_PER_SEC);
 
 	MPI_Finalize();
 

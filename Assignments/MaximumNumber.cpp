@@ -120,7 +120,7 @@ void slave(int slave_rank) {
 
 	printf("\nSlave rank %d sent value %d\n", slave_rank, max_value);
 
-	MPI_Send(&max_value, 1, MPI_INT, 0, slave_rank, MPI_COMM_WORLD); //... Send the index to the Master
+	MPI_Send(&max_value, 1, MPI_INT, 0, slave_rank, MPI_COMM_WORLD);
 
 	delete[] sub_array;
 }
