@@ -126,6 +126,7 @@ void slave(int slave_rank) {
 }
 
 int main(int argc, char* argv[]) {
+	clock_t start = clock();
 	MPI_Init(&argc, &argv);
 
 	int rank;
@@ -135,6 +136,7 @@ int main(int argc, char* argv[]) {
 	MPI_Comm_size(MPI_COMM_WORLD, &nproc);
 
 	if (rank == 0) {
+		start = clock();
 		input();
 		master(nproc - 1);
 
@@ -142,6 +144,7 @@ int main(int argc, char* argv[]) {
 		slave(rank);
 	}
 
+	printf("\nTime taken: %.5fs\n", (double)(clock() - start)/CLOCKS_PER_SEC);
 	MPI_Finalize();
 
 	return 0;

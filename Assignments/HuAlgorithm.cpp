@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <iostream>
 #include <vector>
-#include "mpi.h"
 #include <map>
 #include <algorithm>
 #include <string>
+#include "mpi.h"
 
 using namespace std;
 
@@ -14,7 +14,6 @@ class Tree {
 private:
 	vector<int> nodes;
 	vector<int>* adj_list;
-	vector<int>* reversed_adj_list;
 	map<int, int> priority_table;
 	bool* visited;
 	int counter;
@@ -72,7 +71,6 @@ public:
 		this->is_node_exist(v);
 
 		this->adj_list[u].push_back(v);
-		this->reversed_adj_list[v].push_back(u);
 	}
 	void make_undirected_edge(int u, int v) {
 		this->is_node_exist(u);
@@ -149,10 +147,11 @@ public:
 	int get_node_priority(int u) {
 		return this->priority_table[u];
 	}
-	vector<vector<int>> run_scheduling(int nproc) {
+	vector<int>* run_scheduling(int nproc) {
 		vector<pair<int, int>> priority_table_vector = get_priority_table_vector();
-		vector<vector<int>> schedule_table;
-		bool* scheduled_nodes = new bool[nodes.size()];
+		vector<int>* schedule_table;
+		schedule_table = new vector<int>[100];
+		vector<bool> scheduled_nodes(nodes.size());
 
 		for (int i = 0; i < nodes.size(); i++)
 			scheduled_nodes[i] = false;
@@ -160,32 +159,76 @@ public:
 		scheduled_nodes[nodes[0]] = true;
 		int row = 0;
 
-		for (vector<pair<int, int>>::iterator it = priority_table_vector.begin(); it != priority_table_vector.end(); it++) {
-			int current_highest_priority_node = it->first;
+		puts("-----------BEGIN----------");
 
-			if (!scheduled_nodes[current_highest_priority_node]) {
-				for (int i = 1; i < nodes.size(); i++) {
-					bool all_pred_visited = true;
-					for (int j = 0; j < this->adj_list[i].size(); j++) {
-						if (current_highest_priority_node == this->adj_list[i][j]) {
-							if (!scheduled_nodes[nodes[i]]) {
-								all_pred_visited = false;
+		for (int it = 0; it < priority_table_vector.size(); ) {
+			vector<int> v;
+			bool all_visited = false;
+
+			for (int i = 0; i < nproc; i++) {
+				if (!scheduled_nodes[priority_table_vector[it].first]) {
+					all_visited = true;
+					v.push_back(priority_table_vector[it].first);
+					if (it < priority_table_vector.size() - 1)
+						it++;
+				}
+			}
+
+			if (!all_visited) break;
+
+			vector<bool> local_visited(nodes.size());
+			for (int i = 0; i < v.size(); i++)
+				local_visited[i] = false;
+
+			for (int vis_index = 0; vis_index <  v.size(); vis_index++) {
+				int current_highest_priority_node = v[vis_index];
+
+				if (!scheduled_nodes[current_highest_priority_node]) {
+					map<int, bool> all_pred_visited_for_each_node;
+
+					for (int t = 1; t < nodes.size(); t++)
+						all_pred_visited_for_each_node[nodes[t]] = true;
+
+					for (int i = 0; i < nodes.size(); i++) {
+						for (int j = 0; j < this->adj_list[i].size(); j++) {
+							if (current_highest_priority_node == this->adj_list[i][j]) {
+								if (scheduled_nodes[nodes[i]]) {
+									all_pred_visited_for_each_node[current_highest_priority_node] = false;
+								}
 							}
 						}
 					}
 
-					if (all_pred_visited) {
-						scheduled_nodes[current_highest_priority_node] = true;
-
-						if (schedule_table[row].size() < nproc) {
-							schedule_table[row].push_back(current_highest_priority_node);
-						} else {
-							schedule_table[++row].push_back(current_highest_priority_node);
+					for (auto node : all_pred_visited_for_each_node) {
+						if (current_highest_priority_node == node.first) {
+							if (node.second == false) {
+								local_visited[current_highest_priority_node] = true;
+							}
 						}
 					}
 				}
 			}
+
+			for (int i = 0; i < v.size(); i++) {
+				if (local_visited[v[i]]) {
+					scheduled_nodes[v[i]] = true;
+					if (schedule_table[row].size() < nproc) {
+						schedule_table[row].push_back(v[i]);
+					} else {
+						schedule_table[++row].push_back(v[i]);
+					}
+				} else {
+					it--;
+					if (schedule_table[row].size() < nproc) {
+						schedule_table[row].push_back(0);
+					} else {
+						schedule_table[++row].push_back(0);
+					}
+				}
+			}
 		}
+
+		return schedule_table;
 	}
 };
 
@@ -228,6 +271,15 @@ void master(int nproc) {
 	Tree t(nodes);
 	create_tree(nodes, t);
 	map<int, int> priority_table_map = t.get_priority_table_map();
+	t.display_priority_table();
+	vector<int>* gantt_chart = t.run_scheduling(nproc);
+
+	for (int i = 0; i < nproc + 1; i++) {
+		for (int j = 0; j < gantt_chart[i].size(); j++) {
+			printf("%d ", gantt_chart[i][j]);
+		}
+		puts("");
+	}
 }
 
 int main(int argc, char* argv[]) {
@@ -240,7 +292,7 @@ int main(int argc, char* argv[]) {
 	MPI_Comm_size(MPI_COMM_WORLD, &nproc);
 
 	if (rank == 0) {
-		master(nproc - 1);
+		master(nproc);
 	} else {
 
 	}

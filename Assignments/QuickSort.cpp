@@ -189,6 +189,7 @@ int main(int argc, char* argv[]) {
 
 	if (rank == 0) {
 		input();
+		start = clock();
 		master(nproc - 1);
 
 	} else {
